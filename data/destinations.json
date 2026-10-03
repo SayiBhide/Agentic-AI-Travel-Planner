@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Shri Krishna Janmabhoomi Temple",
+    "city": "Mathura",
+    "category": "Temple",
+    "description": "A major religious site associated with the birthplace of Lord Krishna.",
+    "cultural_significance": "Important pilgrimage destination in Mathura.",
+    "estimated_duration_hours": 2,
+    "entry_fee": 0,
+    "opening": "05:00",
+    "closing": "21:30",
+    "tags": ["temples", "spiritual", "history"]
+  },
+  {
+    "name": "Dwarkadhish Temple",
+    "city": "Mathura",
+    "category": "Temple",
+    "description": "A historic Krishna temple known for its religious and architectural importance.",
+    "cultural_significance": "One of the important temples visited by pilgrims in Mathura.",
+    "estimated_duration_hours": 1.5,
+    "entry_fee": 0,
+    "opening": "06:30",
+    "closing": "21:00",
+    "tags": ["temples", "spiritual", "architecture"]
+  },
+  {
+    "name": "Vishram Ghat",
+    "city": "Mathura",
+    "category": "Heritage",
+    "description": "A prominent ghat on the Yamuna River and an important cultural site.",
+    "cultural_significance": "Associated with traditional religious activities and evening rituals.",
+    "estimated_duration_hours": 1,
+    "entry_fee": 0,
+    "opening": "05:30",
+    "closing": "22:00",
+    "tags": ["heritage", "river", "spiritual", "food"]
+  },
+  {
+    "name": "Banke Bihari Temple",
+    "city": "Vrindavan",
+    "category": "Temple",
+    "description": "A famous Krishna temple and major pilgrimage destination in Vrindavan.",
+    "cultural_significance": "One of the most visited religious sites in Vrindavan.",
+    "estimated_duration_hours": 2,
+    "entry_fee": 0,
+    "opening": "07:45",
+    "closing": "21:30",
+    "tags": ["temples", "spiritual", "pilgrimage"]
+  },
+  {
+    "name": "ISKCON Vrindavan",
+    "city": "Vrindavan",
+    "category": "Temple",
+    "description": "A well-known Krishna temple complex with devotional activities and cultural programs.",
+    "cultural_significance": "Popular spiritual and cultural destination.",
+    "estimated_duration_hours": 1.5,
+    "entry_fee": 0,
+    "opening": "04:30",
+    "closing": "21:00",
+    "tags": ["temples", "spiritual", "culture"]
+  },
+  {
+    "name": "Prem Mandir",
+    "city": "Vrindavan",
+    "category": "Temple",
+    "description": "A large temple complex known for its architecture, gardens and evening illumination.",
+    "cultural_significance": "Popular destination for visitors interested in spirituality and architecture.",
+    "estimated_duration_hours": 2,
+    "entry_fee": 0,
+    "opening": "05:30",
+    "closing": "20:30",
+    "tags": ["temples", "architecture", "spiritual"]
+  },
+  {
+    "name": "Govardhan Hill",
+    "city": "Govardhan",
+    "category": "Heritage",
+    "description": "A sacred hill associated with Krishna traditions and pilgrimage.",
+    "cultural_significance": "Important pilgrimage location near Mathura and Vrindavan.",
+    "estimated_duration_hours": 2.5,
+    "entry_fee": 0,
+    "opening": "05:00",
+    "closing": "21:00",
+    "tags": ["spiritual", "heritage", "nature"]
+  },
+  {
+    "name": "Mathura Local Food Market",
+    "city": "Mathura",
+    "category": "Food",
+    "description": "A local area where visitors can experience traditional Mathura food and sweets.",
+    "cultural_significance": "Provides an opportunity to experience local food culture.",
+    "estimated_duration_hours": 1,
+    "entry_fee": 0,
+    "opening": "09:00",
+    "closing": "21:00",
+    "tags": ["food", "local", "culture"]
+  }
+]
