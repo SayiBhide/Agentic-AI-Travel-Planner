@@ -248,30 +248,30 @@ with input_left:
     )
 
     days = st.number_input(
-        "🗓️ Number of days",
-        min_value=1,
-        max_value=14,
-        value=2,
-        step=1,
+    "🗓️ Number of days",
+    min_value=1,
+    max_value=365,
+    value=2,
+    step=1
     )
 
 
 with input_right:
 
     travelers = st.number_input(
-        "👥 Number of travelers",
-        min_value=1,
-        max_value=20,
-        value=4,
-        step=1,
+    "👥 Number of travelers",
+    min_value=1,
+    max_value=100,
+    value=4,
+    step=1
     )
 
     budget = st.number_input(
-        "💰 Total trip budget (₹)",
-        min_value=500,
-        max_value=500000,
-        value=5000,
-        step=500,
+    "💰 Total trip budget (₹)",
+    min_value=100,
+    max_value=10000000,
+    value=5000,
+    step=500
     )
 
     interest_options = {
@@ -393,6 +393,19 @@ if st.session_state.result is not None:
     result = st.session_state.result
 
     # --------------------------------------------------------
+    # RESULT VALUES
+    # Keep these values available to every result section.
+    # --------------------------------------------------------
+
+    estimated_cost = float(
+        result.get("estimated_cost", 0)
+    )
+
+    replan_count = int(
+        result.get("replan_count", 0)
+    )
+
+    # --------------------------------------------------------
     # NEW TRIP BUTTON
     # --------------------------------------------------------
 
@@ -430,14 +443,6 @@ if st.session_state.result is not None:
         unsafe_allow_html=True,
     )
 
-    estimated_cost = float(
-        result.get("estimated_cost", 0)
-    )
-
-    replan_count = int(
-        result.get("replan_count", 0)
-    )
-
     metric1, metric2, metric3, metric4 = st.columns(4)
 
     with metric1:
@@ -468,49 +473,114 @@ if st.session_state.result is not None:
             replan_count,
         )
 
-
     # --------------------------------------------------------
     # BUDGET
     # --------------------------------------------------------
 
     st.markdown(
-        '<div class="section-title-text">'
-        '💰 Budget overview'
-        '</div>',
-        unsafe_allow_html=True,
+       '<div class="section-title-text">'
+       '💰 Budget overview'
+       '</div>',
+       unsafe_allow_html=True,
+    )
+
+    # Get the estimated cost directly from the agent result.
+    # This keeps the budget section independent of earlier variables.
+    estimated_cost = float(
+    result.get("estimated_cost", 0)
     )
 
     budget_ratio = 0.0
 
     if float(budget) > 0:
 
-        budget_ratio = min(
-            estimated_cost / float(budget),
-            1.0,
-        )
+      budget_ratio = min(
+        estimated_cost / float(budget),
+        1.0,
+      )
 
     st.progress(
-        budget_ratio,
-        text=(
-            f"₹{estimated_cost:,.0f} estimated / "
-            f"₹{float(budget):,.0f} budget"
-        ),
+      budget_ratio,
+      text=(
+         f"₹{estimated_cost:,.0f} estimated / "
+         f"₹{float(budget):,.0f} maximum budget"
+      ),
     )
 
     if estimated_cost <= float(budget):
 
-        st.success(
-            f"✓ Estimated cost of ₹{estimated_cost:,.0f} "
-            f"fits within your ₹{float(budget):,.0f} budget."
-        )
+     st.success(
+        f"✓ The estimated trip cost of "
+        f"₹{estimated_cost:,.0f} is within your "
+        f"maximum budget of ₹{float(budget):,.0f}."
+     )
 
     else:
 
-        st.warning(
-            f"⚠ Estimated cost of ₹{estimated_cost:,.0f} "
-            f"is above the requested budget of ₹{float(budget):,.0f}."
+     st.warning(
+        f"⚠ The estimated trip cost of "
+        f"₹{estimated_cost:,.0f} is above your "
+        f"maximum budget of ₹{float(budget):,.0f}. "
+        f"The agent attempted a lower-cost replan."
+     )
+
+   # --------------------------------------------------------
+   # COST BREAKDOWN
+   # --------------------------------------------------------
+
+    cost_breakdown = result.get(
+    "cost_breakdown",
+    {}
+    )
+
+    if cost_breakdown:
+
+     st.markdown(
+        '<div class="section-subtitle-text">'
+        'The budget is a maximum constraint — the agent estimates '
+        'the realistic trip cost instead of automatically spending '
+        'the full budget.'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
+    cost1, cost2, cost3 = st.columns(3)
+
+    with cost1:
+
+        st.metric(
+            "🏨 Accommodation",
+            f"₹{float(cost_breakdown.get('accommodation', 0)):,.0f}",
         )
 
+        st.metric(
+            "🍜 Food",
+            f"₹{float(cost_breakdown.get('food', 0)):,.0f}",
+        )
+
+    with cost2:
+
+        st.metric(
+            "🚆 Transport",
+            f"₹{float(cost_breakdown.get('transport_to_destination', 0)):,.0f}",
+        )
+
+        st.metric(
+            "🚌 Local transport",
+            f"₹{float(cost_breakdown.get('local_transport', 0)):,.0f}",
+        )
+
+    with cost3:
+
+        st.metric(
+            "🎟️ Activities",
+            f"₹{float(cost_breakdown.get('activities', 0)):,.0f}",
+        )
+
+        st.metric(
+            "🧾 Miscellaneous",
+            f"₹{float(cost_breakdown.get('miscellaneous', 0)):,.0f}",
+        )
 
     # --------------------------------------------------------
     # AGENTIC PLANNING PROCESS
