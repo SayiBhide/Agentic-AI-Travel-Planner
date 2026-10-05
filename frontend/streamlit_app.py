@@ -1,11 +1,11 @@
+import math
 import sys
 from pathlib import Path
 
 import streamlit as st
 
-
 # ============================================================
-# PROJECT ROOT
+# PROJECT ROOT (so `agent` and `tools` can be imported)
 # ============================================================
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -13,12 +13,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-
-from agent.agent import run_travel_agent
+from agent.agent import run_travel_agent  # noqa: E402
 
 
 # ============================================================
-# PAGE CONFIGURATION
+# PAGE CONFIG + CSS
 # ============================================================
 
 st.set_page_config(
@@ -28,250 +27,127 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-
-# ============================================================
-# CUSTOM CSS
-# ============================================================
-
 st.markdown(
     """
     <style>
+    .stApp { background-color: #FFF9F3; }
+    .block-container { max-width: 1180px; padding-top: 2rem; padding-bottom: 4rem; }
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    header { background: transparent !important; }
 
-    .stApp {
-        background-color: #FFF9F3;
-    }
+    .hero-title-text { color:#12355B; font-size:46px; font-weight:850; line-height:1.05; margin:4px 0 8px 0; }
+    .hero-subtitle-text { color:#536878; font-size:17px; line-height:1.65; max-width:850px; margin-bottom:8px; }
+    .hero-note-text { color:#176B87; font-size:14px; font-weight:650; margin-bottom:20px; }
+    .hero-badge-text { color:#176B87; font-size:12px; font-weight:800; letter-spacing:0.7px; margin-bottom:2px; }
+    .section-title-text { color:#12355B; font-size:27px; font-weight:800; margin-top:24px; margin-bottom:3px; }
+    .section-subtitle-text { color:#718096; font-size:14px; margin-bottom:15px; }
 
-    .block-container {
-        max-width: 1180px;
-        padding-top: 2rem;
-        padding-bottom: 4rem;
-    }
-
-    #MainMenu {
-        visibility: hidden;
-    }
-
-    footer {
-        visibility: hidden;
-    }
-
-    header {
-        background: transparent !important;
-    }
-
-    /* Hero */
-
-    .hero-title-text {
-        color: #12355B;
-        font-size: 46px;
-        font-weight: 850;
-        line-height: 1.05;
-        margin: 4px 0 8px 0;
-    }
-
-    .hero-subtitle-text {
-        color: #536878;
-        font-size: 17px;
-        line-height: 1.65;
-        max-width: 850px;
-        margin-bottom: 8px;
-    }
-
-    .hero-note-text {
-        color: #176B87;
-        font-size: 14px;
-        font-weight: 650;
-        margin-bottom: 20px;
-    }
-
-    .hero-badge-text {
-        color: #176B87;
-        font-size: 12px;
-        font-weight: 800;
-        letter-spacing: 0.7px;
-        margin-bottom: 2px;
-    }
-
-    /* Section headings */
-
-    .section-title-text {
-        color: #12355B;
-        font-size: 27px;
-        font-weight: 800;
-        margin-top: 24px;
-        margin-bottom: 3px;
-    }
-
-    .section-subtitle-text {
-        color: #718096;
-        font-size: 14px;
-        margin-bottom: 15px;
-    }
-
-    /* Buttons */
-
-    .stButton > button {
-        border-radius: 13px;
-        font-weight: 750;
-        min-height: 46px;
-    }
-
-    .stButton > button[kind="primary"] {
-        background: linear-gradient(90deg, #FF7A59, #FF9F68);
-        border: none;
-    }
-
-    /* Inputs */
-
-    div[data-baseweb="input"] > div,
-    div[data-baseweb="select"] > div {
-        border-radius: 11px;
-    }
-
-    /* Metrics */
+    .stButton > button { border-radius:13px; font-weight:750; min-height:46px; }
+    .stButton > button[kind="primary"] { background: linear-gradient(90deg,#FF7A59,#FF9F68); border:none; }
+    div[data-baseweb="input"] > div, div[data-baseweb="select"] > div { border-radius:11px; }
 
     div[data-testid="stMetric"] {
-        background: white;
-        border: 1px solid #F0E4D8;
-        border-radius: 16px;
-        padding: 15px 17px;
-        box-shadow: 0 5px 16px rgba(40, 70, 90, 0.05);
+        background:white; border:1px solid #F0E4D8; border-radius:16px;
+        padding:15px 17px; box-shadow:0 5px 16px rgba(40,70,90,0.05);
     }
+    div[data-testid="stMetricLabel"] { color:#718096; }
+    div[data-testid="stMetricValue"] { color:#12355B; }
+    div[data-testid="stExpander"] { border:1px solid #E9DED3; border-radius:14px; background:white; }
 
-    div[data-testid="stMetricLabel"] {
-        color: #718096;
-    }
-
-    div[data-testid="stMetricValue"] {
-        color: #12355B;
-    }
-
-    /* Expanders */
-
-    div[data-testid="stExpander"] {
-        border: 1px solid #E9DED3;
-        border-radius: 14px;
-        background: white;
-    }
-
-    /* Footer */
-
-    .footer-text {
-        text-align: center;
-        color: #8A98A5;
-        font-size: 12px;
-        margin-top: 42px;
-        padding-top: 20px;
-        border-top: 1px solid #EDE2D8;
-    }
-
+    .footer-text { text-align:center; color:#8A98A5; font-size:12px; margin-top:42px;
+                   padding-top:20px; border-top:1px solid #EDE2D8; }
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-
-# ============================================================
-# SESSION STATE
-# ============================================================
-
 if "result" not in st.session_state:
     st.session_state.result = None
+
+
+@st.cache_resource
+def _plan_cache() -> dict:
+    """Server-wide memory of finished plans, so identical inputs give identical output."""
+    return {}
+
+
+def get_plan(destination, days, travelers, budget, interests, start_location, fresh):
+    key = (
+        destination.strip().lower(), int(days), int(travelers), float(budget),
+        tuple(sorted(interests)), start_location.strip().lower(),
+    )
+    cache = _plan_cache()
+
+    if not fresh and key in cache:
+        return {**cache[key], "from_cache": True}
+
+    result = run_travel_agent(
+        destination=destination.strip(),
+        days=int(days),
+        travelers=int(travelers),
+        budget=float(budget),
+        interests=list(interests),
+        start_location=start_location.strip(),
+    )
+
+    # Only remember clean results (never remember fallback/failed ones).
+    if not result.get("warnings"):
+        cache[key] = result
+
+    return {**result, "from_cache": False}
+
+
+def title(text: str) -> None:
+    st.markdown(f'<div class="section-title-text">{text}</div>', unsafe_allow_html=True)
+
+
+def subtitle(text: str) -> None:
+    st.markdown(f'<div class="section-subtitle-text">{text}</div>', unsafe_allow_html=True)
 
 
 # ============================================================
 # HERO
 # ============================================================
 
+st.markdown('<div class="hero-badge-text">✨ AI-POWERED • TOOL-USING • ADAPTIVE</div>', unsafe_allow_html=True)
+st.markdown('<div class="hero-title-text">🌴 TravelMind AI</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="hero-badge-text">'
-    '✨ AI-POWERED • TOOL-USING • ADAPTIVE'
-    '</div>',
+    '<div class="hero-subtitle-text">Your intelligent travel planning agent that searches destination '
+    'information, reasons over your requirements, calculates estimated costs and adapts the journey '
+    'when constraints are not satisfied.</div>',
     unsafe_allow_html=True,
 )
-
-st.markdown(
-    '<div class="hero-title-text">🌴 TravelMind AI</div>',
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    '<div class="hero-subtitle-text">'
-    'Your intelligent travel planning agent that searches destination '
-    'information, reasons over your requirements, calculates estimated '
-    'costs and adapts the journey when constraints are not satisfied.'
-    '</div>',
-    unsafe_allow_html=True,
-)
-
-st.markdown(
-    '<div class="hero-note-text">'
-    '🌍 Plan trips for any destination'
-    '</div>',
-    unsafe_allow_html=True,
-)
-
+st.markdown('<div class="hero-note-text">🇮🇳 Plan trips to destinations across India • all costs in ₹</div>', unsafe_allow_html=True)
 st.divider()
 
 
 # ============================================================
-# INPUT SECTION
+# INPUTS
 # ============================================================
 
-st.markdown(
-    '<div class="section-title-text">Plan your journey</div>',
-    unsafe_allow_html=True,
-)
+title("Plan your journey")
+subtitle("Tell the agent what kind of trip you want. Destinations within India are supported.")
 
-st.markdown(
-    '<div class="section-subtitle-text">'
-    'Tell the agent what kind of trip you want.'
-    '</div>',
-    unsafe_allow_html=True,
-)
+left, right = st.columns(2)
 
-input_left, input_right = st.columns(2)
-
-
-with input_left:
-
+with left:
     destination = st.text_input(
         "📍 Destination",
         value="Mathura & Vrindavan",
-        placeholder="Goa, Manali, Jaipur, Paris...",
+        placeholder="Goa, Manali, Jaipur, Varanasi, Kerala...",
     )
-
     start_location = st.text_input(
         "🚉 Starting location",
         value="Mathura Railway Station",
-        placeholder="Airport, railway station, hotel or city",
+        placeholder="City, railway station or airport in India",
     )
+    days = st.number_input("🗓️ Number of days", min_value=1, max_value=30, value=2, step=1)
 
-    days = st.number_input(
-    "🗓️ Number of days",
-    min_value=1,
-    max_value=365,
-    value=2,
-    step=1
-    )
-
-
-with input_right:
-
-    travelers = st.number_input(
-    "👥 Number of travelers",
-    min_value=1,
-    max_value=100,
-    value=4,
-    step=1
-    )
-
+with right:
+    travelers = st.number_input("👥 Number of travelers", min_value=1, max_value=100, value=4, step=1)
     budget = st.number_input(
-    "💰 Total trip budget (₹)",
-    min_value=100,
-    max_value=10000000,
-    value=5000,
-    step=500
+        "💰 Total trip budget (₹)", min_value=100, max_value=100000000, value=5000, step=500
     )
 
     interest_options = {
@@ -287,616 +163,255 @@ with input_right:
         "📸 Sightseeing": "sightseeing",
     }
 
-    selected_interest_labels = st.multiselect(
+    selected_labels = st.multiselect(
         "❤️ Travel interests",
         options=list(interest_options.keys()),
-        default=[
-            "🛕 Temples & Culture",
-            "🍜 Food",
-        ],
+        default=["🛕 Temples & Culture", "🍜 Food"],
     )
 
-    interests = [
-        interest_options[label]
-        for label in selected_interest_labels
-    ]
+    interests = [interest_options[label] for label in selected_labels]
 
+_, button_col, _ = st.columns([1, 2, 1])
 
-# ============================================================
-# ACTION BUTTON
-# ============================================================
-
-button_col1, button_col2, button_col3 = st.columns([1, 2, 1])
-
-with button_col2:
-
-    plan_trip = st.button(
-        "✈️ Plan My Journey",
-        use_container_width=True,
-        type="primary",
+with button_col:
+    plan_trip = st.button("✈️ Plan My Journey", use_container_width=True, type="primary")
+    fresh_plan = st.checkbox(
+        "🔄 Generate a fresh plan (ignore the saved plan for these inputs)", value=False
     )
 
 
 # ============================================================
-# INTRODUCTION BEFORE FIRST PLAN
+# INTRO (before first plan)
 # ============================================================
 
 if st.session_state.result is None and not plan_trip:
-
     st.info(
         "🤖 **How TravelMind AI works**\n\n"
-        "TravelMind AI does more than generate a fixed itinerary. "
-        "The agent understands the trip requirements, gathers information "
-        "using external tools, estimates costs, checks constraints and "
-        "can revise its plan when the initial plan does not satisfy them."
+        "TravelMind AI does more than generate a fixed itinerary. The agent understands the trip "
+        "requirements, gathers information using external tools, estimates costs, checks constraints "
+        "and can revise its plan when the initial plan does not satisfy them."
     )
-
     st.success(
-        "💡 **Agentic example:** If the initial plan exceeds the requested "
-        "budget, the agent can trigger a replanning step and generate a "
-        "revised plan."
+        "💡 **Agentic example:** If the initial plan exceeds the requested budget, the agent triggers "
+        "a replanning step and generates a cheaper plan."
     )
 
 
 # ============================================================
-# PLAN REQUEST
+# RUN THE AGENT
 # ============================================================
 
 if plan_trip:
-
     if not destination.strip():
-
         st.error("Please enter a destination.")
-
-    elif not selected_interest_labels:
-
+    elif not selected_labels:
         st.error("Please select at least one travel interest.")
-
     else:
-
-        with st.spinner(
-            "🤖 Your travel agent is searching, calculating and planning..."
-        ):
-
+        with st.spinner("🤖 Your travel agent is searching, calculating and planning... (this can take up to a minute)"):
             try:
-
-                result = run_travel_agent(
-                    destination=destination.strip(),
-                    days=int(days),
-                    travelers=int(travelers),
-                    budget=float(budget),
-                    interests=interests,
-                    start_location=start_location.strip(),
+                st.session_state.result = get_plan(
+                    destination, days, travelers, budget, interests, start_location, fresh_plan
                 )
-
-                st.session_state.result = result
-
                 st.rerun()
-
             except Exception as error:
-
-                st.error(
-                    "The travel agent could not complete the request."
-                )
-
-                with st.expander("Technical details"):
-
-                    st.code(str(error))
+                st.error("The travel agent could not complete the request.")
+                st.code(f"{type(error).__name__}: {error}")
 
 
 # ============================================================
-# DISPLAY RESULTS
+# RESULTS
 # ============================================================
 
-if st.session_state.result is not None:
+result = st.session_state.result
 
-    result = st.session_state.result
+if result is not None:
+    # Always use the inputs the plan was generated with (not the current widget values).
+    inp = result.get("inputs", {})
+    r_dest = inp.get("destination", destination)
+    r_days = int(inp.get("days", days))
+    r_budget = float(inp.get("budget", budget))
 
-    # --------------------------------------------------------
-    # RESULT VALUES
-    # Keep these values available to every result section.
-    # --------------------------------------------------------
+    estimated_cost = float(result.get("estimated_cost", 0))
+    replan_count = int(result.get("replan_count", 0))
+    constraints = result.get("constraint_results", {})
+    breakdown = result.get("cost_breakdown", {}) or {}
 
-    estimated_cost = float(
-        result.get("estimated_cost", 0)
-    )
+    _, new_col = st.columns([5, 1])
 
-    replan_count = int(
-        result.get("replan_count", 0)
-    )
-
-    # --------------------------------------------------------
-    # NEW TRIP BUTTON
-    # --------------------------------------------------------
-
-    top_left, top_right = st.columns([5, 1])
-
-    with top_right:
-
-        if st.button(
-            "↻ New Trip",
-            use_container_width=True,
-        ):
-
+    with new_col:
+        if st.button("↻ New Trip", use_container_width=True):
             st.session_state.result = None
             st.rerun()
 
-
-    # --------------------------------------------------------
-    # SUCCESS MESSAGE
-    # --------------------------------------------------------
-
-    st.success(
-        f"✓ Journey planned successfully for **{destination}**. "
-        "The agent completed its planning and validation process."
-    )
-
-
-    # --------------------------------------------------------
-    # RESULT SUMMARY
-    # --------------------------------------------------------
-
-    st.markdown(
-        '<div class="section-title-text">'
-        'Your AI-planned journey'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    metric1, metric2, metric3, metric4 = st.columns(4)
-
-    with metric1:
-
-        st.metric(
-            "📍 Destination",
-            destination,
+    if result.get("from_cache"):
+        st.info(
+            "ℹ️ Showing the saved plan for these exact inputs. "
+            "Tick 'Generate a fresh plan' to create a new one."
         )
 
-    with metric2:
+    for message in result.get("warnings", []):
+        st.warning(message)
 
-        st.metric(
-            "🗓️ Duration",
-            f"{int(days)} day{'s' if int(days) != 1 else ''}",
-        )
+    if constraints.get("overall"):
+        st.success(f"✓ Journey planned successfully for **{r_dest}**. The agent completed its planning and validation process.")
+    else:
+        st.warning(f"⚠ Journey planned for **{r_dest}**, but one or more constraints are not fully satisfied (see validation below).")
 
-    with metric3:
+    # ---------------- summary ----------------
+    title("Your AI-planned journey")
 
-        st.metric(
-            "💰 Estimated cost",
-            f"₹{estimated_cost:,.0f}",
-        )
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("📍 Destination", r_dest)
+    m2.metric("🗓️ Duration", f"{r_days} day{'s' if r_days != 1 else ''}")
+    m3.metric("💰 Estimated cost", f"₹{estimated_cost:,.0f}")
+    m4.metric("🔄 AI replans", replan_count)
 
-    with metric4:
+    # ---------------- budget ----------------
+    title("💰 Budget overview")
 
-        st.metric(
-            "🔄 AI replans",
-            replan_count,
-        )
-
-    # --------------------------------------------------------
-    # BUDGET
-    # --------------------------------------------------------
-
-    st.markdown(
-       '<div class="section-title-text">'
-       '💰 Budget overview'
-       '</div>',
-       unsafe_allow_html=True,
-    )
-
-    # Get the estimated cost directly from the agent result.
-    # This keeps the budget section independent of earlier variables.
-    estimated_cost = float(
-    result.get("estimated_cost", 0)
-    )
-
-    budget_ratio = 0.0
-
-    if float(budget) > 0:
-
-      budget_ratio = min(
-        estimated_cost / float(budget),
-        1.0,
-      )
+    ratio = min(estimated_cost / r_budget, 1.0) if r_budget > 0 else 0.0
 
     st.progress(
-      budget_ratio,
-      text=(
-         f"₹{estimated_cost:,.0f} estimated / "
-         f"₹{float(budget):,.0f} maximum budget"
-      ),
+        ratio,
+        text=f"₹{estimated_cost:,.0f} estimated / ₹{r_budget:,.0f} maximum budget",
     )
 
-    if estimated_cost <= float(budget):
-
-     st.success(
-        f"✓ The estimated trip cost of "
-        f"₹{estimated_cost:,.0f} is within your "
-        f"maximum budget of ₹{float(budget):,.0f}."
-     )
-
+    if estimated_cost <= r_budget:
+        st.success(f"✓ The estimated trip cost of ₹{estimated_cost:,.0f} is within your maximum budget of ₹{r_budget:,.0f}.")
     else:
+        st.warning(
+            f"⚠ The estimated trip cost of ₹{estimated_cost:,.0f} is above your maximum budget of "
+            f"₹{r_budget:,.0f}. "
+            + ("The agent attempted a lower-cost replan. " if replan_count else "")
+            + f"A more realistic budget for this trip is about "
+            f"₹{int(math.ceil(estimated_cost / 1000.0) * 1000):,}."
+        )
 
-     st.warning(
-        f"⚠ The estimated trip cost of "
-        f"₹{estimated_cost:,.0f} is above your "
-        f"maximum budget of ₹{float(budget):,.0f}. "
-        f"The agent attempted a lower-cost replan."
-     )
-
-   # --------------------------------------------------------
-   # COST BREAKDOWN
-   # --------------------------------------------------------
-
-    cost_breakdown = result.get(
-    "cost_breakdown",
-    {}
+    subtitle(
+        "The budget is a maximum constraint — the agent estimates the realistic trip cost "
+        "instead of automatically spending the full budget."
     )
 
-    if cost_breakdown:
+    c1, c2, c3 = st.columns(3)
 
-     st.markdown(
-        '<div class="section-subtitle-text">'
-        'The budget is a maximum constraint — the agent estimates '
-        'the realistic trip cost instead of automatically spending '
-        'the full budget.'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    def money(key: str) -> str:
+        return f"₹{float(breakdown.get(key, 0)):,.0f}"
 
-    cost1, cost2, cost3 = st.columns(3)
+    with c1:
+        st.metric("🏨 Accommodation", money("accommodation"))
+        st.metric("🍜 Food", money("food"))
+    with c2:
+        st.metric("🚆 Transport to destination", money("transport_to_destination"))
+        st.metric("🚌 Local transport", money("local_transport"))
+    with c3:
+        st.metric("🎟️ Activities", money("activities"))
+        st.metric("🧾 Miscellaneous", money("miscellaneous"))
 
-    with cost1:
+    # ---------------- agent trace ----------------
+    title("🧠 AI planning journey")
+    subtitle("A simplified view of the actions performed by the agent.")
 
-        st.metric(
-            "🏨 Accommodation",
-            f"₹{float(cost_breakdown.get('accommodation', 0)):,.0f}",
-        )
+    steps: list[tuple[str, str]] = []
 
-        st.metric(
-            "🍜 Food",
-            f"₹{float(cost_breakdown.get('food', 0)):,.0f}",
-        )
-
-    with cost2:
-
-        st.metric(
-            "🚆 Transport",
-            f"₹{float(cost_breakdown.get('transport_to_destination', 0)):,.0f}",
-        )
-
-        st.metric(
-            "🚌 Local transport",
-            f"₹{float(cost_breakdown.get('local_transport', 0)):,.0f}",
-        )
-
-    with cost3:
-
-        st.metric(
-            "🎟️ Activities",
-            f"₹{float(cost_breakdown.get('activities', 0)):,.0f}",
-        )
-
-        st.metric(
-            "🧾 Miscellaneous",
-            f"₹{float(cost_breakdown.get('miscellaneous', 0)):,.0f}",
-        )
-
-    # --------------------------------------------------------
-    # AGENTIC PLANNING PROCESS
-    # --------------------------------------------------------
-
-    st.markdown(
-        '<div class="section-title-text">'
-        '🧠 AI planning journey'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        '<div class="section-subtitle-text">'
-        'A simplified view of the actions performed by the agent.'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    trace = result.get("trace", [])
-
-    process_items = []
-
-    for item in trace:
-
-        action = str(
-            item.get("action", "")
-        ).lower()
-
-        observation = item.get(
-            "observation",
-            {},
-        )
+    for item in result.get("trace", []):
+        action = str(item.get("action", "")).lower()
+        obs = item.get("observation", {})
 
         if action == "goal_received":
-
-            process_items.append(
-                ("normal", "✓ Understanding your travel requirements")
-            )
-
+            steps.append(("ok", "✓ Understanding your travel requirements"))
         elif action == "destination_database":
-
-            process_items.append(
-                ("normal", "✓ Checking curated destination information")
-            )
-
-        elif action in [
-            "web_search",
-            "tavily_search",
-        ]:
-
-            process_items.append(
-                (
-                    "normal",
-                    "✓ Searching destination information on the web",
-                )
-            )
-
+            steps.append(("ok", "✓ Checking curated destination information"))
+        elif action == "tavily_search":
+            found = obs.get("results", 0) if isinstance(obs, dict) else 0
+            if found:
+                steps.append(("ok", f"✓ Searching destination information on the web ({found} sources)"))
+            else:
+                steps.append(("warn", "⚠ Web search returned no results"))
         elif action == "calculator":
-
-            process_items.append(
-                (
-                    "normal",
-                    "✓ Calculating the estimated trip cost",
-                )
-            )
-
-        elif action in [
-            "constraint_check",
-            "constraint_check_initial",
-            "constraint_check_after_replan",
-        ]:
-
-            budget_ok = True
-
-            if isinstance(observation, dict):
-
-                if "budget" in observation:
-
-                    budget_ok = bool(
-                        observation.get("budget")
-                    )
-
-            if budget_ok:
-
-                process_items.append(
-                    (
-                        "normal",
-                        "✓ Checking trip constraints",
-                    )
-                )
-
+            steps.append(("ok", "✓ Calculating the estimated trip cost"))
+        elif action == "constraint_check":
+            if isinstance(obs, dict) and not obs.get("budget", True):
+                steps.append(("warn", "⚠ Initial plan exceeded the requested budget"))
             else:
-
-                process_items.append(
-                    (
-                        "replan",
-                        "⚠ Initial plan exceeded the requested budget",
-                    )
-                )
-
+                steps.append(("ok", "✓ Checking trip constraints"))
         elif action == "replan":
-
-            process_items.append(
-                (
-                    "replan",
-                    "↻ Replanning the journey to satisfy constraints",
-                )
-            )
-
-        elif action == "itinerary_generated":
-
-            process_items.append(
-                (
-                    "normal",
-                    "✓ Generating the final itinerary",
-                )
-            )
-
-        elif action == "completed":
-
-            process_items.append(
-                (
-                    "normal",
-                    "✓ Final journey ready",
-                )
-            )
-
-
-    # Remove consecutive duplicate steps
-
-    cleaned_process = []
-
-    for item in process_items:
-
-        if not cleaned_process or item != cleaned_process[-1]:
-
-            cleaned_process.append(item)
-
-
-    if cleaned_process:
-
-        for item_type, message in cleaned_process:
-
-            if item_type == "replan":
-
-                st.warning(message)
-
+            steps.append(("warn", "↻ Replanning the journey to satisfy constraints"))
+        elif action == "calculator_after_replan":
+            steps.append(("ok", "✓ Recalculating the cost of the revised plan"))
+        elif action == "constraint_check_after_replan":
+            if isinstance(obs, dict) and not obs.get("budget", True):
+                steps.append(("warn", "⚠ Final plan is still above the requested budget"))
             else:
+                steps.append(("ok", "✓ Final constraint check passed"))
+        elif action == "itinerary_generated":
+            steps.append(("ok", "✓ Generating the final itinerary"))
+        elif action == "completed":
+            steps.append(("ok", "✓ Final journey ready"))
 
-                st.success(message)
+    for kind, message in steps:
+        (st.warning if kind == "warn" else st.success)(message)
 
-    else:
+    # ---------------- itinerary ----------------
+    title("🗺️ Your itinerary")
 
-        st.info(
-            "The agent completed its planning process."
-        )
-
-
-    # --------------------------------------------------------
-    # FINAL ITINERARY
-    # --------------------------------------------------------
-
-    st.markdown(
-        '<div class="section-title-text">'
-        '🗺️ Your itinerary'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
-    final_answer = result.get(
-        "final_answer",
-        "",
-    )
+    final_answer = result.get("final_answer", "")
 
     if final_answer:
-
         st.markdown(final_answer)
-
     else:
+        st.info("The agent completed the planning process, but no formatted itinerary was returned.")
 
-        st.info(
-            "The agent completed the planning process, "
-            "but no formatted itinerary was returned."
-        )
-
-
-    # --------------------------------------------------------
-    # SELECTED PLACES
-    # --------------------------------------------------------
-
-    itinerary = result.get(
-        "itinerary",
-        [],
-    )
+    itinerary = result.get("itinerary", [])
 
     if itinerary:
+        title("📍 Places included")
 
-        st.markdown(
-            '<div class="section-title-text">'
-            '📍 Places included'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        for index, place in enumerate(
-            itinerary,
-            start=1,
-        ):
-
-            place_name = place.get(
-                "name",
-                place.get(
-                    "place",
-                    "Recommended place",
-                ),
-            )
-
-            description = place.get(
-                "description",
-                "Recommended as part of your travel plan.",
-            )
-
+        for index, place in enumerate(itinerary, start=1):
             st.info(
-                f"**{index}. 📍 {place_name}**\n\n"
-                f"{description}"
+                f"**{index}. 📍 {place.get('name', 'Recommended place')}** "
+                f"(Day {place.get('day', '?')})\n\n"
+                f"{place.get('description', '')}"
             )
 
+    # ---------------- validation ----------------
+    title("✅ Plan validation")
 
-    # --------------------------------------------------------
-    # PLAN VALIDATION
-    # --------------------------------------------------------
+    budget_ok = bool(constraints.get("budget", estimated_cost <= r_budget))
+    days_covered = {int(p.get("day", 0)) for p in itinerary}
+    days_ok = all(d in days_covered for d in range(1, r_days + 1))
+    overall_ok = budget_ok and days_ok
 
-    st.markdown(
-        '<div class="section-title-text">'
-        '✅ Plan validation'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+    v1, v2, v3 = st.columns(3)
 
-    budget_ok = (
-        estimated_cost <= float(budget)
-    )
-
-    duration_ok = bool(final_answer)
-
-    overall_ok = (
-        budget_ok and duration_ok
-    )
-
-    validation1, validation2, validation3 = st.columns(3)
-
-    with validation1:
-
+    with v1:
         if budget_ok:
-
             st.success("✓ Budget satisfied")
-
         else:
-
             st.warning("⚠ Budget requires attention")
 
-    with validation2:
-
-        if duration_ok:
-
-            st.success(
-                f"✓ {int(days)}-day plan generated"
-            )
-
+    with v2:
+        if days_ok:
+            st.success(f"✓ All {r_days} days planned")
         else:
+            st.warning("⚠ Some days have no activities")
 
-            st.warning(
-                "⚠ Duration could not be verified"
-            )
-
-    with validation3:
-
+    with v3:
         if overall_ok:
-
             st.success("✓ Plan ready")
-
         else:
+            st.warning("⚠ Plan requires attention")
 
-            st.warning(
-                "⚠ Plan requires attention"
-            )
-
-
-    # --------------------------------------------------------
-    # PROJECT EXPLANATION
-    # --------------------------------------------------------
-
-    st.markdown(
-        '<div class="section-title-text">'
-        '🤖 Why this is an agent'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-
+    title("🤖 Why this is an agent")
     st.info(
-        "The system combines an LLM with external tools and short-term "
-        "state. It searches for information, calculates costs, checks "
-        "constraints and can replan instead of producing only a single "
-        "static response."
+        "The system combines an LLM with external tools and short-term state. It searches for "
+        "information, calculates costs, checks constraints and can replan instead of producing only "
+        "a single static response."
     )
 
-
-# ============================================================
-# FOOTER
-# ============================================================
 
 st.markdown(
-    '<div class="footer-text">'
-    'TravelMind AI • Agentic AI Travel Planning System<br>'
-    'LLM reasoning • Tool use • Constraint checking • Adaptive replanning'
-    '</div>',
+    '<div class="footer-text">TravelMind AI • Agentic AI Travel Planning System<br>'
+    'LLM reasoning • Tool use • Constraint checking • Adaptive replanning</div>',
     unsafe_allow_html=True,
 )
+

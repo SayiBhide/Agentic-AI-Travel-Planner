@@ -1,13 +1,17 @@
-import streamlit as st
+from __future__ import annotations
+
 from tavily import TavilyClient
+
+from tools.config import get_secret
 
 
 def search_web(query: str, max_results: int = 5) -> list[dict]:
-    """
-    Search the web using Tavily and return simplified results.
-    """
+    """Search the web with Tavily and return simplified results.
 
-    api_key = st.secrets.get("TAVILY_API_KEY")
+    NOTE: the previous version never returned anything (no `return` statement),
+    so the agent always received None and silently ignored all web research.
+    """
+    api_key = get_secret("TAVILY_API_KEY")
 
     if not api_key:
         raise ValueError("TAVILY_API_KEY is not configured.")
@@ -17,16 +21,18 @@ def search_web(query: str, max_results: int = 5) -> list[dict]:
     response = client.search(
         query=query,
         search_depth="basic",
-        max_results=max_results
+        max_results=max_results,
     )
 
-    results = []
+    results: list[dict] = []
 
-    for result in response.get("results", []):
-        results.append({
-            "title": result.get("title", ""),
-            "url": result.get("url", ""),
-            "content": result.get("content", "")
-        })
+    for item in response.get("results", []):
+        results.append(
+            {
+                "title": item.get("title", "") or "",
+                "url": item.get("url", "") or "",
+                "content": item.get("content", "") or "",
+            }
+        )
 
     return results
